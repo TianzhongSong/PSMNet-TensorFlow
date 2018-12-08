@@ -21,6 +21,8 @@ class Model:
         self.left = tf.placeholder(tf.float32, shape=[self.batch_size, self.height, self.weight, 3])
         self.right = tf.placeholder(tf.float32, shape=[self.batch_size, self.height, self.weight, 3])
         self.label = tf.placeholder(tf.float32, shape=[self.batch_size, self.height, self.weight])
+        self.is_training = tf.placeholder(tf.bool, name='is_training')
+
         self.image_size_tf = tf.shape(self.left)[1:3]
 
         conv4_left = self.CNN(self.left)
@@ -164,15 +166,15 @@ class Model:
 
     def train(self, left, right, label):
         _, loss = self.sess.run([self.train_op, self.loss],
-                                feed_dict={self.left: left, self.right: right, self.label: label})
+                                feed_dict={self.left: left, self.right: right, self.label: label, self.is_training:True})
         return loss
 
     def test(self, left, right, label):
         pred, loss = self.sess.run([self.disps, self.loss],
-                                   feed_dict={self.left: left, self.right: right, self.label: label})
+                                   feed_dict={self.left: left, self.right: right, self.label: label, self.is_training:False})
         return pred, loss
 
     def predict(self, left, right):
         pred = self.sess.run([self.disps],
-                             feed_dict={self.left: left, self.right: right})
+                             feed_dict={self.left: left, self.right: right, self.is_training:False})
         return pred
